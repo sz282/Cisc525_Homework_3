@@ -3,6 +3,7 @@
 from pyspark import SparkContext, SparkConf, SQLContext
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import desc
+from pyspark.sql.functions import asc 
 import subprocess
 
 import sys
@@ -21,6 +22,19 @@ class Performance():
         orig_airports = self.df.groupBy('Origin').count().orderBy(desc('count'))
         self.sc.parallelize(orig_airports.collect()).saveAsTextFile(out_dir)
         return orig_airports.first()
+    # implement three additional functions 
+    def originated_airport_with_least_flights(self, out_dir):
+        orig_airports = self.df.groupBy('Origin').count().orderBy(asc('count'))
+        self.sc.parallelize(orig_airports.collect()).saveAsTextFile(out_dir)
+        return orig_airports.first()
+    def destination_airport_with_most_flights(self, out_dir):
+        dest_airports = self.df.groupBy('Dest').count().orderBy(desc('count'))
+        self.sc.parallelize(dest_airports.collect()).saveAsTextFile(out_air)
+        return dest_airports.first()
+    def destination_airports_with_least_flights(self, out_dir):
+        dest_airports = self.df.groupBy('Dest').count().orderBy(asc('count'))
+        self.sc.parallelize(dest_airports.collect()).saveAsTextFile(out_dir)
+        return dest_airports.first()
 
 
 def delete_out_dir(out_dir):
@@ -28,6 +42,11 @@ def delete_out_dir(out_dir):
 
 
 def main(argv):
+    delete_out_dir(argv[1])
+    perf = Performance()
+    perf.load_year(argv[0])
+    most_count = perf.originated_airport_with_most_flights(argv[1])
+    print('{} has the most originated flights at {}'.format(most_count['Origin'], most_count['count']))
     delete_out_dir(argv[1])
     least_count = perf.originated_airport_with_least_flights(argv[1])
     print('{} has the least originated flights at {}'.format(least_count['Origin'], most_count['count']))
