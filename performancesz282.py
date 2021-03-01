@@ -29,9 +29,9 @@ class Performance():
         return orig_airports.first()
     def destination_airport_with_most_flights(self, out_dir):
         dest_airports = self.df.groupBy('Dest').count().orderBy(desc('count'))
-        self.sc.parallelize(dest_airports.collect()).saveAsTextFile(out_air)
+        self.sc.parallelize(dest_airports.collect()).saveAsTextFile(out_dir)
         return dest_airports.first()
-    def destination_airports_with_least_flights(self, out_dir):
+    def destination_airport_with_least_flights(self, out_dir):
         dest_airports = self.df.groupBy('Dest').count().orderBy(asc('count'))
         self.sc.parallelize(dest_airports.collect()).saveAsTextFile(out_dir)
         return dest_airports.first()
@@ -47,12 +47,13 @@ def main(argv):
     perf.load_year(argv[0])
     most_count = perf.originated_airport_with_most_flights(argv[1])
     print('{} has the most originated flights at {}'.format(most_count['Origin'], most_count['count']))
+    #impletement three additional functions
     delete_out_dir(argv[1])
     least_count = perf.originated_airport_with_least_flights(argv[1])
-    print('{} has the least originated flights at {}'.format(least_count['Origin'], most_count['count']))
+    print('{} has the least originated flights at {}'.format(least_count['Origin'], least_count['count']))
     delete_out_dir(argv[1])
     least_count = perf.destination_airport_with_least_flights(argv[1])
-    print('{} has the least destination flights at {}'.format(least_count['Dest'], most_count['count']))
+    print('{} has the least destination flights at {}'.format(least_count['Dest'], least_count['count']))
     delete_out_dir(argv[1])
     most_count = perf.destination_airport_with_most_flights(argv[1])
     print('{} has the most destination flights at {}'.format(most_count['Dest'], most_count['count']))
